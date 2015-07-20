@@ -1,0 +1,21 @@
+---
+# tasks/debian.yml
+
+# Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+- name: package update (apt)
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+  always_run: yes
+  tags: apt
+
+# Update all packages to the latest version
+- name: package upgrade (apt)
+  apt: upgrade=dist
+  sudo: yes
+  always_run: yes
+  tags: apt
+  
+
+- name: ansible_os_family
+  debug: msg="Operating system {{ ansible_os_family }}"
+  tags: apt

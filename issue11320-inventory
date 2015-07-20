@@ -1,0 +1,65 @@
+###
+### real-time.com production-servers
+###
+
+# DNS servers
+[real-time.com-dns-servers]
+dns-1.real-time.com
+dns-2.real-time.com
+
+# Greylist servers
+[real-time.com-greylist-servers]
+smtpgrey-3.real-time.com
+smtpgrey-4.real-time.com
+
+# Web servers
+[real-time.com-web-servers]
+www.imperialplastics.com
+www.precisesoftware.net
+www.utfc.net
+www.wehmann.com
+www.youthlinkmn.org                 ansible_ssh_host=63.170.91.119
+shadowknight.real-time.com
+www.bizbridge.com                   ansible_ssh_host=63.170.91.133
+www.bright-futures.org              ansible_ssh_host=63.170.91.125
+downloads.celadonsystems.com
+www.rootmineralrights.com
+www.tofuturehope.com
+www.jfcsmpls.org                    ansible_ssh_host=63.170.91.109
+www2.conofthenorth.org
+www.metalforge.net
+registration.conofthenorth.org
+crossfire.real-time.com
+
+# SMTP servers     
+[real-time.com-smtp-servers]
+zimbra.real-time.com
+relay.real-time.com
+
+[real-time.com-logging-servers]
+druid.real-time.com
+
+###
+## children
+###
+[dns-servers:children]
+real-time.com-dns-servers
+
+[web-servers:children]
+real-time.com-web-servers
+
+[greylist-servers:children]
+real-time.com-greylist-servers
+
+[smtp-servers:children]
+real-time.com-smtp-servers
+
+[real-time.com:children] 
+real-time.com-dns-servers
+real-time.com-web-servers
+real-time.com-greylist-servers
+real-time.com-smtp-servers
+real-time.com-logging-servers
+
+[linux-servers:children]
+real-time.com

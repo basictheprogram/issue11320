@@ -1,0 +1,12 @@
+---
+# handlers/main.yml
+
+- name: newaliases
+  sudo: yes
+  command: newaliases
+
+- name: reload postfix
+  sudo: yes
+  service:
+    name: 'postfix'
+    state: 'restarted'

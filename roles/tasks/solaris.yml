@@ -1,0 +1,90 @@
+---
+# tasks/solaris.yml
+
+- name: set-publisher sfe (pkg)
+  command: /usr/bin/pkg set-publisher -p http://pkg.openindiana.org/sfe
+  changed_when: False
+  sudo: yes
+  tags:
+    - common
+    - pkg
+
+- name: set publisher sfe-encumbered (pkg)
+  command: /usr/bin/pkg set-publisher -p http://pkg.openindiana.org/sfe-encumbered
+  changed_when: False
+  sudo: yes
+  tags:
+    - common
+    - pkg
+
+- name: set publisher dev openindiana.org (pkg)
+  command: /usr/bin/pkg set-publisher -O http://pkg.openindiana.org/dev openindiana.org
+  changed_when: False
+  sudo: yes
+  tags:
+    - common
+    - pkg
+    
+- name: package update (pkg)
+  command: /usr/bin/pkg refresh --full
+  sudo: yes
+  always_run: yes
+  tags: 
+    - common
+    - pkg
+    - update
+    
+#- name: Ensure core packages are installed (pkg)
+#  command: /usr/bin/pkg install {{item}}
+#  sudo: yes
+#  with_items:
+#      - bash
+#      - bind9-host
+#      - bzr
+#      - git-core
+#      - ntp
+#      - python
+#      - python-simplejson
+#      - traceroute
+#      - rsyslog
+#      - ssh
+#      - vim
+#  tags: 
+#    - common
+#    - pkg
+
+# Update all packages to the latest version
+# 
+# http://download.oracle.com/docs/cd/E19963-01/html/820-6572/pkgman.html
+#
+# EXIT STATUS
+#     The following exit values are returned:
+#
+#     0     Command succeeded.
+#     1     An error occurred.
+#     2     Invalid command line options were specified.
+#     3     Multiple operations were requested, but only some of them
+#           succeeded.
+#     4     No changes were made - nothing to do.
+#
+- name: package upgrade (pkg)
+  command: /usr/bin/pkg update
+  register: command_result
+  failed_when: "'No updates available for this image' not in command_result.stdout"
+  sudo: yes
+  always_run: yes
+  tags: 
+    - common
+    - pkg
+    - upgrade
+            
+- name: Ensure core services are running
+  service: name={{item}} state=running enabled=yes
+  sudo: yes
+  with_items:
+      - ntp
+      - syslog
+      - ssh
+  tags: 
+    - common
+    - pkg

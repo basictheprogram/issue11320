@@ -1,0 +1,81 @@
+---
+# tasks/suse.yml
+  
+- name: set facts SUSE
+  set_fact: 
+    apache_service_name: httpd
+    apache_user: apache
+    apache_httpd_conf_path: /etc/httpd/conf/
+    apache_httpd_conf: /etc/httpd/conf/httpd.conf
+    iptables_conf_path: /etc/sysconfig/iptables
+    mysql_service_name: mysqld
+    mysql_user: mysql
+  tags: 
+    - common
+    - zypper
+      
+- name: Update all out of date packages (zypper)
+  zypper: name=* state=latest
+  sudo: yes
+  always_run: yes
+  tags: 
+    - common
+    - zypper
+    - upgrade
+
+- name: Ensure core packages are installed (zypper)
+  zypper: name={{item}} state=present
+  sudo: yes
+  with_items:
+      - bash
+      - bind-utils  # bind9 host command
+      - bzr
+      - iptables
+      - ntp
+      - traceroute
+      - rsyslog
+      - openssh
+      - vim
+  tags: 
+    - common
+    - zypper
+    - packages
+                
+- name: Ensure core services are running
+  service: name={{item}} state=running
+  sudo: yes
+  with_items:
+      - ntp
+      - rsyslog
+      - sshd
+  tags: 
+    - common
+    - zypper
+    - packages
+    - services
+
+- name: Set iptables to autostart on boot
+  sudo: yes
+  command: /sbin/chkconfig iptables on 
+  tags: iptables
+  
+- name: copy iptables rules
+  sudo: yes
+  copy: 
+    src=iptables/up.rules
+    dest={{iptables_conf_path}}
+    owner=root
+    group=root
+    mode=0640
+  tags: iptables
+
+- name: iptables running
+  sudo: yes
+  service: name=iptables state=started
+  sudo: yes
+  tags: iptables
+      
+- name: restart iptables
+  sudo: yes
+  command: /etc/init.d/iptables restart
+  tags: iptables

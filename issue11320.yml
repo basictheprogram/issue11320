@@ -1,0 +1,7 @@
+---
+# file: issue11320.yml
+
+- hosts: linux-servers
+  remote_user: ansible
+  roles:
+    - issue11320
